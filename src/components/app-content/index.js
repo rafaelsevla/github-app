@@ -1,10 +1,11 @@
-'use strict';
+'use strict'
 
-import React, { PropTypes } from 'react';
-import Search from './search';
-import UserInfo from './user-info';
-import Actions from './actions';
-import Repos from './repos';
+import React, { PropTypes } from 'react'
+import Search from 'components/search'
+import UserInfo from 'components/user-info'
+import Actions from 'components/actions'
+import Repos from 'components/repos'
+import './app.css'
 
 const AppContent = ({
   userinfo,
@@ -15,20 +16,23 @@ const AppContent = ({
   getRepos,
   getStarred
 }) => (
-  <div className="app">
+  <div className='app'>
     <Search isDisabled={isFetching} handleSearch={handleSearch} />
     {isFetching && <div>Carregando...</div>}
     {!!userinfo && <UserInfo userinfo={userinfo} />}
     {!!userinfo && <Actions getRepos={getRepos} getStarred={getStarred} />}
 
-    {!!repos.length && (
-      <Repos title="Repositórios" className="repos" repos={repos} />
-    )}
-    {!!starred.length && (
-      <Repos title="Favoritos" className="starred" repos={starred} />
-    )}
+    <div className='repos-container'>
+      {!!repos.length && (
+        <Repos className='repos' title='Repositórios:' repos={repos} />
+      )}
+
+      {!!starred.length && (
+        <Repos className='starred' title='Favoritos:' repos={starred} />
+      )}
+    </div>
   </div>
-);
+)
 
 AppContent.propTypes = {
   userinfo: PropTypes.object,
@@ -38,6 +42,6 @@ AppContent.propTypes = {
   handleSearch: PropTypes.func.isRequired,
   getRepos: PropTypes.func.isRequired,
   getStarred: PropTypes.func.isRequired
-};
+}
 
-export default AppContent;
+export default AppContent
