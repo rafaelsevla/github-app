@@ -4,13 +4,21 @@ import React, { Component } from 'react'
 import ajax from '@fdaciuk/ajax'
 import AppContent from './components/app-content'
 
+const initialReposState = {
+  repos: [],
+  pagination: {
+    total: 1,
+    activePage: 1
+  }
+}
+
 class App extends Component {
   constructor () {
     super()
     this.state = {
       userinfo: null,
-      repos: [],
-      starred: [],
+      repos: initialReposState,
+      starred: initialReposState,
       isFetching: false
     }
 
@@ -46,8 +54,8 @@ class App extends Component {
               followers: result.followers,
               following: result.following
             },
-            repos: [],
-            starred: []
+            repos: initialReposState,
+            starred: initialReposState
           })
         })
         .always(() => this.setState({ isFetching: false }))
@@ -60,12 +68,23 @@ class App extends Component {
       const username = this.state.userinfo.login
       ajax()
         .get(this.getGitHubApiUrl(username, type, page))
-        .then(result => {
+        .then((result, xhr) => {
+          const linkHeader = xhr.getResponseHeader('link') || ''
+          const totalPagesMatch = linkHeader.match(/&page=(\d+)>; rel="last/)
+
           this.setState({
-            [type]: result.map(repo => ({
-              name: repo.name,
-              link: repo.html_url
-            }))
+            [type]: {
+              repos: result.map(repo => ({
+                name: repo.name,
+                link: repo.html_url
+              })),
+              pagination: {
+                total: totalPagesMatch
+                  ? +totalPagesMatch[1]
+                  : this.state[type].pagination.total,
+                activePage: page
+              }
+            }
           })
         })
     }
